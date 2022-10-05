@@ -1,4 +1,6 @@
-use actix_web::{HttpServer, App, Responder, get, HttpResponse};
+use std::net::IpAddr;
+
+use actix_web::{HttpServer, App, Responder, get, HttpResponse, middleware::Logger};
 use log;
 
 #[get("/")]
@@ -9,18 +11,26 @@ async fn hello() -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
-    env_logger::init();
+    env_logger::init_from_env(
+        env_logger::Env::new().default_filter_or("info"));
 
-    const ADDRS: &str = "127.0.0.1";
-    const PORT: u16 = 8080;
+    let ip_addr: IpAddr = std::env::var("IP_ADDR")
+        .unwrap_or("127.0.0.1".to_string())
+        .parse()
+        .expect("Failed to parse IP_ADDR");
+    let port: u16 = std::env::var("PORT")
+        .unwrap_or("8080".to_string())
+        .parse()
+        .expect("Failed to parse PORT");
     let server = HttpServer::new(|| {
         App::new()
+            .wrap(Logger::default())
             .service(hello)
     })
-    .bind((ADDRS, PORT));
+    .bind((ip_addr, port));
     match server {
         Ok(server) => {
-            log::info!("Server started on {ADDRS}:{PORT}");
+            log::info!("Server started on {:?}:{port}", ip_addr);
             server
                 .run()
                 .await
