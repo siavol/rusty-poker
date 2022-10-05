@@ -1,4 +1,5 @@
 use actix_web::{HttpServer, App, Responder, get, HttpResponse};
+use log;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -7,11 +8,26 @@ async fn hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+
+    env_logger::init();
+
+    const ADDRS: &str = "127.0.0.1";
+    const PORT: u16 = 8080;
+    let server = HttpServer::new(|| {
         App::new()
             .service(hello)
     })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
+    .bind((ADDRS, PORT));
+    match server {
+        Ok(server) => {
+            log::info!("Server started on {ADDRS}:{PORT}");
+            server
+                .run()
+                .await
+        },
+        Err(err) => {
+            log::error!("Can not start server: {:?}", err);
+            Err(err)
+        }
+    }
 }
