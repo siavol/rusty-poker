@@ -819,6 +819,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rusty-poker-server"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "env_logger",
+ "log",
+]
+
+[[package]]
 name = "ryu"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -863,15 +872,6 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "server"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "env_logger",
- "log",
 ]
 
 [[package]]
