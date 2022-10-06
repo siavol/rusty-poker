@@ -1,5 +1,7 @@
-use std::net::IpAddr;
 
+mod routes;
+
+use std::net::IpAddr;
 use actix_web::{HttpServer, App, Responder, get, HttpResponse, middleware::Logger};
 use log;
 
@@ -26,6 +28,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .service(hello)
+            .configure(routes::api::config_service)
     })
     .bind((ip_addr, port));
     match server {

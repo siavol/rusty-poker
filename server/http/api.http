@@ -2,3 +2,7 @@
 @port = 8080
 
 GET http://{{hostname}}:{{port}}/
+
+###
+
+POST http://{{hostname}}:{{port}}/api/session
