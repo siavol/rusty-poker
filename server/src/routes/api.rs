@@ -1,15 +1,9 @@
-use actix_web::{web::{ServiceConfig, scope, self}, Responder, HttpResponse, http::header::ContentType};
+use actix_web::{Responder, HttpResponse, http::header::ContentType};
 
-async fn create_session() -> impl Responder {
+pub async fn create_session() -> impl Responder {
     HttpResponse::Ok()
         .content_type(ContentType::json())
         .body(r#"{ "name": "test", "id": "qwe123" }"#)
-}
-
-pub fn config_service(cfg: &mut ServiceConfig) {
-    cfg.service(scope("/api")
-        .route("/session", web::post().to(create_session))
-    );
 }
 
 #[cfg(test)]
