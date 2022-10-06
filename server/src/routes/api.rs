@@ -1,10 +1,12 @@
 use actix_web::{Responder, HttpResponse, http::header::ContentType, body::BoxBody};
 use serde::{Serialize, Deserialize};
 
+use crate::utils::generate_uid;
+
 #[derive(Serialize, Deserialize)]
 struct Session {
-    name: &'static str,
-    id: &'static str
+    name: String,
+    id: String
 }
 
 impl Responder for Session {
@@ -21,14 +23,16 @@ impl Responder for Session {
 
 pub async fn create_session() -> impl Responder {
     Session {
-        name: "test session",
-        id: "qwe123"
+        name: "test session".to_string(),
+        id: generate_uid()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use actix_web::{test, Responder, http, body::to_bytes};
+
+    use crate::routes::api::Session;
 
     use super::create_session;
 
@@ -44,10 +48,8 @@ mod tests {
             Err(_) => panic!("Can not get response body.")
         };
         let body = std::str::from_utf8(&body).unwrap();
-        assert_eq!(body, r#"{"name":"test session","id":"qwe123"}"#);
-
-        // let session: Session = serde_json::from_str(&body).expect("Failed to parse body as Session object");
-        // assert_eq!(session.name, "test session");
-
+        let session: Session = serde_json::from_str(&body).expect("Failed to parse body as Session object");
+        assert_eq!(session.name, "test session");
+        assert!(session.id.len() > 0);
     }
 }
