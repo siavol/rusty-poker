@@ -60,4 +60,35 @@ mod tests {
         assert_eq!(session.title, "My new session");
         assert!(session.id.len() > 0);
     }
+
+    #[actix_web::test]
+    async fn test_post_api_session_return_unique_id() {
+        let srv = test::init_service(
+            App::new()
+                .configure(app_http_config)
+        )
+        .await;
+
+        let res1 = test::TestRequest::post().uri("/api/session")
+            .set_json(json!({
+                "title": "session 1"
+            }))
+            .send_request(&srv)
+            .await;
+        assert!(res1.status().is_success());
+        let session1: Session = test::read_body_json(res1).await;
+
+        let res2 = test::TestRequest::post().uri("/api/session")
+            .set_json(json!({
+                "title": "session 2"
+            }))
+            .send_request(&srv)
+            .await;
+        assert!(res2.status().is_success());
+        let session2: Session = test::read_body_json(res2).await;
+
+        assert!(session1.id.len() > 0);
+        assert!(session2.id.len() > 0);
+        assert_ne!(session1.id, session2.id);
+    }
 }
