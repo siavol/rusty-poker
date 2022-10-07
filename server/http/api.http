@@ -6,3 +6,8 @@ GET http://{{hostname}}:{{port}}/
 ###
 
 POST http://{{hostname}}:{{port}}/api/session
+Content-Type: application/json
+
+{
+    "title": "my estimation"
+}
