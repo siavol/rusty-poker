@@ -35,21 +35,16 @@ pub async fn create_session(params: web::Json<NewSessionParams>) -> impl Respond
 
 #[cfg(test)]
 mod tests {
-    use actix_web::{test, web, App};
+    use actix_web::{test, App};
     use serde_json::json;
 
-    use crate::routes::api::{Session};
-
-    use super::create_session;
+    use crate::routes::{api::{Session}, app_http_config};
 
     #[actix_web::test]
     async fn test_post_api_sesson_ok() {
         let srv = test::init_service(
             App::new()
-                .service(
-                    web::scope("/api")
-                        .service(web::resource("/session").route(web::post().to(create_session)))
-                )
+                .configure(app_http_config)
         )
         .await;
 

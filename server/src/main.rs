@@ -1,14 +1,13 @@
-
 mod routes;
 mod utils;
+use log;
 
 use std::net::IpAddr;
-use actix_web::{HttpServer, App, Responder, get, HttpResponse, middleware::Logger, web};
-use log;
+use actix_web::{HttpServer, App, Responder, get, HttpResponse, middleware::Logger};
 
 #[get("/")]
 async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
+    HttpResponse::Ok().body("Hello from Rusty Pocker Server!")
 }
 
 #[actix_web::main]
@@ -25,16 +24,15 @@ async fn main() -> std::io::Result<()> {
         .unwrap_or("8080".to_string())
         .parse()
         .expect("Failed to parse PORT");
+
     let server = HttpServer::new(|| {
         App::new()
             .wrap(Logger::default())
             .service(hello)
-            .service(
-                web::scope("/api")
-                    .service(web::resource("/session").route(web::post().to(routes::api::create_session)))
-            )
+            .configure(routes::app_http_config)
     })
     .bind((ip_addr, port));
+
     match server {
         Ok(server) => {
             log::info!("Server started on {:?}:{port}", ip_addr);
