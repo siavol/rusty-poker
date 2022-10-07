@@ -11,7 +11,8 @@ pub struct NewSessionParams {
 #[derive(Serialize, Deserialize)]
 struct Session {
     title: String,
-    id: String
+    id: String,
+    cards: Vec<String>
 }
 
 impl Responder for Session {
@@ -26,10 +27,25 @@ impl Responder for Session {
     }
 }
 
+fn get_cards() -> Vec<String> {
+    vec![
+        "0.5".to_string(),
+        "1".to_string(),
+        "2".to_string(),
+        "3".to_string(),
+        "5".to_string(),
+        "8".to_string(),
+        "13".to_string(),
+        "21".to_string(),
+        "?".to_string()
+    ]
+}
+
 pub async fn create_session(params: web::Json<NewSessionParams>) -> impl Responder {
     Session {
         title: params.title.clone(),
-        id: generate_uid()
+        id: generate_uid(),
+        cards: get_cards()
     }
 }
 
@@ -59,6 +75,7 @@ mod tests {
         let session: Session = test::read_body_json(res).await;
         assert_eq!(session.title, "My new session");
         assert!(session.id.len() > 0);
+        assert!(session.cards.len() > 0);
     }
 
     #[actix_web::test]
