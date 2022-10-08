@@ -1,4 +1,4 @@
-use actix_web::{Responder, HttpResponse, http::header::ContentType, body::BoxBody, web};
+use actix_web::{Responder, web};
 
 use crate::utils::generate_uid;
 use crate::schema::{Session, NewSessionParams};
@@ -23,6 +23,16 @@ pub async fn create_session(params: web::Json<NewSessionParams>) -> impl Respond
         id: generate_uid(),
         cards: get_cards()
     }
+}
+
+pub async fn get_session(_path: web::Path<String>) -> impl Responder {
+    crate::routes::HttpError::NotFound
+    // let id = path.into_inner();
+    // Session {
+    //     title: "from the storage".to_string(),
+    //     id: id,
+    //     cards: get_cards()
+    // }
 }
 
 #[cfg(test)]
@@ -83,5 +93,19 @@ mod tests {
         assert!(session1.id.len() > 0);
         assert!(session2.id.len() > 0);
         assert_ne!(session1.id, session2.id);
+    }
+
+    #[actix_web::test]
+    async fn test_get_api_session_return_not_found() {
+        let srv = test::init_service(
+            App::new()
+                .configure(app_http_config)
+        )
+        .await;
+
+        let res = test::TestRequest::get().uri("/api/session/not-existing")
+            .send_request(&srv)
+            .await;
+        assert_eq!(res.status(), 404);
     }
 }

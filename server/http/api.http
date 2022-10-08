@@ -11,3 +11,7 @@ Content-Type: application/json
 {
     "title": "my estimation"
 }
+
+###
+
+GET http://{{hostname}}:{{port}}/api/session/qwe123
