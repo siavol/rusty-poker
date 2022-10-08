@@ -1,7 +1,11 @@
 use actix_web::{Responder, web};
 
+use crate::AppState;
 use crate::utils::generate_uid;
 use crate::schema::{Session, NewSessionParams};
+use crate::routes::ApiResponse;
+use crate::storage;
+use crate::storage::Storage;
 
 fn get_cards() -> Vec<String> {
     vec![
@@ -17,36 +21,53 @@ fn get_cards() -> Vec<String> {
     ]
 }
 
-pub async fn create_session(params: web::Json<NewSessionParams>) -> impl Responder {
-    Session {
+pub async fn create_session(params: web::Json<NewSessionParams>, data: web::Data<AppState>) -> impl Responder {
+    let session = Session {
         title: params.title.clone(),
         id: generate_uid(),
         cards: get_cards()
-    }
+    };
+    let mut storage = data.storage.lock().unwrap();
+    // TODO: check the error and return HTTP 5xx response
+    storage.save(session.clone()).expect("Failed to save session");
+    return ApiResponse::Ok(session);
 }
 
-pub async fn get_session(_path: web::Path<String>) -> impl Responder {
-    crate::routes::HttpError::NotFound
-    // let id = path.into_inner();
-    // Session {
-    //     title: "from the storage".to_string(),
-    //     id: id,
-    //     cards: get_cards()
-    // }
+pub async fn get_session(path: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
+    let id = path.into_inner();
+    let storage = data.storage.lock().unwrap();
+    match storage.find(&id) {
+        Ok(session) => {
+            let copy = session.clone();
+            ApiResponse::Ok(copy)
+        },
+        Err(storage_err) => match storage_err {
+            storage::Error::NotFound => ApiResponse::NotFound
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use actix_web::{test, App};
+    use std::sync::Mutex;
+    use actix_web::{test, App, web};
     use serde_json::json;
-
+    use crate::AppState;
+    use crate::storage;
     use crate::routes::{api::{Session}, app_http_config};
+    
+    fn app_test_config(cfg: &mut web::ServiceConfig) {
+        cfg
+            .app_data(web::Data::new(AppState {
+                storage: Mutex::new(storage::memory::MemoryStorage::new())
+            }))
+            .configure(app_http_config);
+    }    
 
     #[actix_web::test]
     async fn test_post_api_sesson_ok() {
-        let srv = test::init_service(
-            App::new()
-                .configure(app_http_config)
+        let srv = test::init_service(App::new()
+            .configure(app_test_config)
         )
         .await;
 
@@ -68,7 +89,7 @@ mod tests {
     async fn test_post_api_session_return_unique_id() {
         let srv = test::init_service(
             App::new()
-                .configure(app_http_config)
+                .configure(app_test_config)
         )
         .await;
 
@@ -99,7 +120,7 @@ mod tests {
     async fn test_get_api_session_return_not_found() {
         let srv = test::init_service(
             App::new()
-                .configure(app_http_config)
+                .configure(app_test_config)
         )
         .await;
 

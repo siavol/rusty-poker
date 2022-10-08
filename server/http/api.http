@@ -5,6 +5,7 @@ GET http://{{hostname}}:{{port}}/
 
 ###
 
+# @name postSession
 POST http://{{hostname}}:{{port}}/api/session
 Content-Type: application/json
 
@@ -14,4 +15,8 @@ Content-Type: application/json
 
 ###
 
-GET http://{{hostname}}:{{port}}/api/session/qwe123
+@sessionId = {{postSession.response.body.$.id}}
+
+###
+
+GET http://{{hostname}}:{{port}}/api/session/{{sessionId}}

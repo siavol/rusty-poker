@@ -4,8 +4,14 @@ mod schema;
 mod storage;
 
 use std::net::IpAddr;
-use actix_web::{HttpServer, App, Responder, get, HttpResponse, middleware::Logger};
+use std::sync::Mutex;
+use actix_web::{HttpServer, App, Responder, get, HttpResponse, middleware::Logger, web};
 use log;
+
+// switch to generic app state with Storage
+pub struct AppState {
+    storage: Mutex<storage::memory::MemoryStorage>,
+}
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -27,8 +33,12 @@ async fn main() -> std::io::Result<()> {
         .parse()
         .expect("Failed to parse PORT");
 
-    let server = HttpServer::new(|| {
+    let data = web::Data::new(AppState {
+        storage: Mutex::new(storage::memory::MemoryStorage::new())
+    });
+    let server = HttpServer::new(move || {
         App::new()
+            .app_data(data.clone())
             .wrap(Logger::default())
             .service(hello)
             .configure(routes::app_http_config)

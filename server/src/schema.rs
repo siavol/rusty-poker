@@ -5,7 +5,7 @@ pub struct NewSessionParams {
     pub title: String
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct Session {
     pub title: String,
     pub id: String,

@@ -11,7 +11,7 @@ pub trait Storage {
     fn find(&self, session_id: &String) -> Result<&schema::Session, Error>;
 }
 
-mod memory {
+pub mod memory {
     use crate::schema;
     use crate::storage::{Storage, Error};
     use std::collections::HashMap;
@@ -81,19 +81,17 @@ mod memory {
         #[test]
         fn save_updates_existing_session() {
             let mut storage = MemoryStorage::new();
-            let result = storage.save(schema::Session{
+            storage.save(schema::Session{
                 title: "my test session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string()]
-            });
-            assert_eq!(result, Result::Ok(()));
+            }).expect("failed to save session");
 
-            let result = storage.save(schema::Session{
+            storage.save(schema::Session{
                 title: "my updated session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string(), "3".to_string()]
-            });
-            assert_eq!(result, Result::Ok(()));
+            }).expect("failed to update session");
 
             let session = storage.find(&"id1".to_string());
             assert_eq!(session, Result::Ok(&schema::Session {
@@ -101,7 +99,6 @@ mod memory {
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string(), "3".to_string()]
             }));
-
         }
 
         #[test]
@@ -119,8 +116,7 @@ mod memory {
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string()]
             };
-            let result = storage.save(session);
-            assert_eq!(result, Result::Ok(()));
+            storage.save(session).expect("Failed to save session");
 
             let session = storage.find(&"id1".to_string());
             assert_eq!(session, Result::Ok(&schema::Session {
