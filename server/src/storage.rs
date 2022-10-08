@@ -8,7 +8,7 @@ pub enum Error {
 
 pub trait Storage {
     fn save(&mut self, session: schema::Session) -> Result<(), &'static str>;
-    fn find(&self, session_id: &String) -> Result<schema::Session, Error>;
+    fn find(&self, session_id: &String) -> Result<&schema::Session, Error>;
 }
 
 mod memory {
@@ -16,7 +16,7 @@ mod memory {
     use crate::storage::{Storage, Error};
     use std::collections::HashMap;
 
-    struct MemoryStorage {
+    pub struct MemoryStorage {
         session_map: HashMap<String, schema::Session>,
     }
 
@@ -38,8 +38,13 @@ mod memory {
             }
         }
 
-        fn find(&self, _session_id: &String) -> Result<schema::Session, Error> {
-            return Result::Err(Error::NotFound);
+        fn find(&self, session_id: &String) -> Result<&schema::Session, Error> {
+            let session = self.session_map.get(session_id);
+            if session == None {
+                return Result::Err(Error::NotFound);
+            } else {
+                return Result::Ok(session.unwrap());
+            }
         }
     }
 
@@ -78,6 +83,25 @@ mod memory {
             let storage = MemoryStorage::new();
             let result = storage.find(&String::from("not-existing"));
             assert_eq!(result, Result::Err(Error::NotFound));
+        }
+
+        #[test]
+        fn find_returns_session() {
+            let mut storage = MemoryStorage::new();
+            let session = schema::Session{
+                title: "my test session".to_string(),
+                id: "id1".to_string(),
+                cards: vec!["1".to_string(), "2".to_string()]
+            };
+            let result = storage.save(session);
+            assert_eq!(result, Result::Ok(()));
+
+            let session = storage.find(&"id1".to_string());
+            assert_eq!(session, Result::Ok(&schema::Session {
+                title: "my test session".to_string(),
+                id: "id1".to_string(),
+                cards: vec!["1".to_string(), "2".to_string()]
+            }));
         }
     }
 }
