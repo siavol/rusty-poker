@@ -5,17 +5,13 @@ mod storage;
 
 use std::net::IpAddr;
 use std::sync::Mutex;
-use actix_web::{HttpServer, App, Responder, get, HttpResponse, middleware::Logger, web};
+use actix_files;
+use actix_web::{HttpServer, App, middleware::Logger, web};
 use log;
 
 // switch to generic app state with Storage
 pub struct AppState {
     storage: Mutex<storage::memory::MemoryStorage>,
-}
-
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello from Rusty Pocker Server!")
 }
 
 #[actix_web::main]
@@ -40,7 +36,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(data.clone())
             .wrap(Logger::default())
-            .service(hello)
+            .service(actix_files::Files::new("/", "./static").index_file("index.html"))
             .configure(routes::app_http_config)
     })
     .bind((ip_addr, port));
