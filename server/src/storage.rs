@@ -1,5 +1,6 @@
 use crate::schema;
 
+#[derive(Debug, PartialEq)]
 pub enum Error {
     NotFound,
     // Internal(String),
@@ -46,10 +47,10 @@ mod memory {
     mod tests {
         use super::MemoryStorage;
         use crate::schema;
-        use crate::storage::{Storage};
+        use crate::storage::{Storage, Error};
 
         #[test]
-        fn save_session_returns_ok() {
+        fn save_returns_ok() {
             let mut storage = MemoryStorage::new();
             let session = schema::Session{
                 title: "my test session".to_string(),
@@ -61,7 +62,7 @@ mod memory {
         }
 
         #[test]
-        fn save_session_returns_error_when_id_is_empty() {
+        fn save_returns_error_when_id_is_empty() {
             let mut storage = MemoryStorage::new();
             let session = schema::Session{
                 title: "empty id session".to_string(),
@@ -70,6 +71,13 @@ mod memory {
             };
             let result = storage.save(session);
             assert_eq!(result, Result::Err("id can not be empty"))
+        }
+
+        #[test]
+        fn find_returns_not_found() {
+            let storage = MemoryStorage::new();
+            let result = storage.find(&String::from("not-existing"));
+            assert_eq!(result, Result::Err(Error::NotFound));
         }
     }
 }
