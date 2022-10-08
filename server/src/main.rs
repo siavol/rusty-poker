@@ -1,6 +1,7 @@
 mod routes;
 mod utils;
 mod schema;
+mod storage;
 
 use std::net::IpAddr;
 use actix_web::{HttpServer, App, Responder, get, HttpResponse, middleware::Logger};
