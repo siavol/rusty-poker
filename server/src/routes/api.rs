@@ -1,31 +1,7 @@
 use actix_web::{Responder, HttpResponse, http::header::ContentType, body::BoxBody, web};
-use serde::{Serialize, Deserialize};
 
 use crate::utils::generate_uid;
-
-#[derive(Deserialize)]
-pub struct NewSessionParams {
-    title: String
-}
-
-#[derive(Serialize, Deserialize)]
-struct Session {
-    title: String,
-    id: String,
-    cards: Vec<String>
-}
-
-impl Responder for Session {
-    type Body = BoxBody;
-
-    fn respond_to(self, _req: &actix_web::HttpRequest) -> HttpResponse<Self::Body> {
-        let body = serde_json::to_string(&self).unwrap();
-
-        HttpResponse::Ok()
-            .content_type(ContentType::json())
-            .body(body)
-    }
-}
+use crate::schema::{Session, NewSessionParams};
 
 fn get_cards() -> Vec<String> {
     vec![

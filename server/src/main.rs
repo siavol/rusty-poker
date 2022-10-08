@@ -1,9 +1,10 @@
 mod routes;
 mod utils;
-use log;
+mod schema;
 
 use std::net::IpAddr;
 use actix_web::{HttpServer, App, Responder, get, HttpResponse, middleware::Logger};
+use log;
 
 #[get("/")]
 async fn hello() -> impl Responder {
