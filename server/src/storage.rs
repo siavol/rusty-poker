@@ -79,6 +79,32 @@ mod memory {
         }
 
         #[test]
+        fn save_updates_existing_session() {
+            let mut storage = MemoryStorage::new();
+            let result = storage.save(schema::Session{
+                title: "my test session".to_string(),
+                id: "id1".to_string(),
+                cards: vec!["1".to_string(), "2".to_string()]
+            });
+            assert_eq!(result, Result::Ok(()));
+
+            let result = storage.save(schema::Session{
+                title: "my updated session".to_string(),
+                id: "id1".to_string(),
+                cards: vec!["1".to_string(), "2".to_string(), "3".to_string()]
+            });
+            assert_eq!(result, Result::Ok(()));
+
+            let session = storage.find(&"id1".to_string());
+            assert_eq!(session, Result::Ok(&schema::Session {
+                title: "my updated session".to_string(),
+                id: "id1".to_string(),
+                cards: vec!["1".to_string(), "2".to_string(), "3".to_string()]
+            }));
+
+        }
+
+        #[test]
         fn find_returns_not_found() {
             let storage = MemoryStorage::new();
             let result = storage.find(&String::from("not-existing"));
