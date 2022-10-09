@@ -12,6 +12,20 @@
     rustup target add wasm32-unknown-unknown
     ```
 
+## Dev
+
+Start the server:
+```bash
+cd server
+RUST_LOG=debug cargo run
+```
+
+Open one more terminal. Start the client with the proxy to server (and in watch client changes mode):
+```bash
+cd client
+trunk serve --proxy-backend=http://localhost:3000/api/ 
+```
+
 ## Run
 
 Build the client:

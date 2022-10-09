@@ -9,3 +9,6 @@ edition = "2021"
 yew="0.19"
 log="0.4.17"
 wasm-logger="0.2.0"
+gloo-net="0.2.4"
+serde={version = "1.0.145", features = ["derive"]}
+wasm-bindgen-futures="0.4.33"

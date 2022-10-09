@@ -1,5 +1,6 @@
 // use yew::prelude::*;
 use yew::{html, Component, Context, Html};
+use gloo_net::http::Request;
 
 enum NewSessionMsg {
     CreateSession
@@ -37,6 +38,17 @@ impl Component for NewSessionUI {
         match msg {
             NewSessionMsg::CreateSession => {
                 log::info!("New title: {}", self.title);
+                wasm_bindgen_futures::spawn_local(async move {
+                    Request::post("/api/session")
+                        .header("Content-Type", "application/json")
+                        .body("test body")
+                        .send()
+                        .await
+                        // .unwrap()
+                        // .json()
+                        // .await
+                        .unwrap();
+                });
                 false
             }
         }
