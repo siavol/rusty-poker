@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 yew="0.19"
+log="0.4.17"
+wasm-logger="0.2.0"

@@ -23,5 +23,5 @@ trunk build -d ../server/static
 Run server:
 ```bash
 cd server
-RUST_LOG=debug PORT=8080 cargo run
+RUST_LOG=debug cargo run
 ```

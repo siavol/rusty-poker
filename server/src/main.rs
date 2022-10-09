@@ -25,7 +25,7 @@ async fn main() -> std::io::Result<()> {
         .parse()
         .expect("Failed to parse IP_ADDR");
     let port: u16 = std::env::var("PORT")
-        .unwrap_or("8080".to_string())
+        .unwrap_or("3000".to_string())
         .parse()
         .expect("Failed to parse PORT");
 
