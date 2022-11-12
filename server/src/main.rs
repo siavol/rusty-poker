@@ -1,3 +1,4 @@
+mod schema;
 mod routes;
 mod utils;
 mod storage;

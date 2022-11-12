@@ -3,7 +3,7 @@ pub mod api;
 use actix_web::{web, Responder, body::BoxBody, HttpResponse, http::header::ContentType};
 use serde_json::json;
 
-use rusty_poker_common::Session;
+use crate::schema::Session;
 
 pub fn app_http_config(cfg: &mut web::ServiceConfig) {
     cfg.service(

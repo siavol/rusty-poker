@@ -2,10 +2,12 @@ use actix_web::{Responder, web};
 
 use crate::AppState;
 use crate::utils::generate_uid;
-use rusty_poker_common::{Session, NewSessionParams};
+use crate::schema::Session;
 use crate::routes::ApiResponse;
 use crate::storage;
 use crate::storage::Storage;
+
+use rusty_poker_common::NewSessionParams;
 
 fn get_cards() -> Vec<String> {
     vec![

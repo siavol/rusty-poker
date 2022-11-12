@@ -1,4 +1,4 @@
-use rusty_poker_common::{Session};
+use crate::schema::Session;
 
 #[derive(Debug, PartialEq)]
 pub enum Error {
@@ -12,7 +12,7 @@ pub trait Storage {
 }
 
 pub mod memory {
-    use rusty_poker_common::{Session};
+    use crate::schema::Session;
     use crate::storage::{Storage, Error};
     use std::collections::HashMap;
 
@@ -51,7 +51,7 @@ pub mod memory {
     #[cfg(test)]
     mod tests {
         use super::MemoryStorage;
-        use rusty_poker_common::{Session};
+        use crate::schema::Session;
         use crate::storage::{Storage, Error};
 
         #[test]
@@ -111,7 +111,7 @@ pub mod memory {
         #[test]
         fn find_returns_session() {
             let mut storage = MemoryStorage::new();
-            let session = rusty_poker_common::Session{
+            let session = Session{
                 title: "my test session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string()]
@@ -119,7 +119,7 @@ pub mod memory {
             storage.save(session).expect("Failed to save session");
 
             let session = storage.find(&"id1".to_string());
-            assert_eq!(session, Result::Ok(&rusty_poker_common::Session {
+            assert_eq!(session, Result::Ok(&Session {
                 title: "my test session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string()]
