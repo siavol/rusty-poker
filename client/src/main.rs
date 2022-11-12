@@ -16,7 +16,7 @@ impl Component for NewSessionUI {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            title: "Story #123".to_string()
+            title: "".to_string()
         }
     }
 
@@ -26,10 +26,10 @@ impl Component for NewSessionUI {
         html! {
             <div class="container">
                 <div class="form-group">
-                    <label for="topic">{ "New session title" }</label>
-                    <input type="text" id="topic" name="topic" />
+                    <label for="topic">{ "start new session" }</label>
+                    <input type="text" id="topic" name="topic" placeholder="your session title" />
                 </div>
-                <button class="btn btn_bord u_margin_top" onclick={on_create_session}>{ "Create" }</button>
+                <button class="btn btn_bord u_margin_top" onclick={on_create_session}>{ "create" }</button>
             </div>
         }
     }
