@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct NewSessionParams {
     pub title: String
 }

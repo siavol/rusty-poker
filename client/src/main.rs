@@ -1,6 +1,8 @@
 // use yew::prelude::*;
 use yew::{html, Component, Context, Html};
 use gloo_net::http::Request;
+use serde_json;
+use rusty_poker_common::{NewSessionParams};
 
 enum NewSessionMsg {
     CreateSession
@@ -38,10 +40,14 @@ impl Component for NewSessionUI {
         match msg {
             NewSessionMsg::CreateSession => {
                 log::info!("New title: {}", self.title);
+                let session = NewSessionParams{
+                    title: "test session".to_string()
+                };
+                let request_body = serde_json::to_string(&session).unwrap();
                 wasm_bindgen_futures::spawn_local(async move {
                     Request::post("/api/session")
                         .header("Content-Type", "application/json")
-                        .body("test body")
+                        .body(request_body)
                         .send()
                         .await
                         // .unwrap()
