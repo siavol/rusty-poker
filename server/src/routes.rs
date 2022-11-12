@@ -29,7 +29,7 @@ impl Responder for ApiResponse {
                 let body = serde_json::to_string(value).unwrap();
                 HttpResponse::Ok()
                     .content_type(ContentType::json())
-                    .body(body)        
+                    .body(body)
             },
             ApiResponse::NotFound => HttpResponse::NotFound()
                 .content_type(ContentType::json())

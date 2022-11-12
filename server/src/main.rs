@@ -36,8 +36,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(data.clone())
             .wrap(Logger::default())
-            .service(actix_files::Files::new("/", "./static").index_file("index.html"))
             .configure(routes::app_http_config)
+            .service(actix_files::Files::new("/", "./static").index_file("index.html"))
     })
     .bind((ip_addr, port));
 
