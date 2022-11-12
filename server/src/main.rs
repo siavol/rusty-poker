@@ -1,6 +1,5 @@
 mod routes;
 mod utils;
-mod schema;
 mod storage;
 
 use std::net::IpAddr;

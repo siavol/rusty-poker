@@ -2,7 +2,7 @@ use actix_web::{Responder, web};
 
 use crate::AppState;
 use crate::utils::generate_uid;
-use crate::schema::{Session, NewSessionParams};
+use rusty_poker_common::{Session, NewSessionParams};
 use crate::routes::ApiResponse;
 use crate::storage;
 use crate::storage::Storage;

@@ -3,7 +3,7 @@ pub mod api;
 use actix_web::{web, Responder, body::BoxBody, HttpResponse, http::header::ContentType};
 use serde_json::json;
 
-use crate::schema::Session;
+use rusty_poker_common::Session;
 
 pub fn app_http_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -29,7 +29,7 @@ impl Responder for ApiResponse {
                 let body = serde_json::to_string(value).unwrap();
                 HttpResponse::Ok()
                     .content_type(ContentType::json())
-                    .body(body)        
+                    .body(body)
             },
             ApiResponse::NotFound => HttpResponse::NotFound()
                 .content_type(ContentType::json())

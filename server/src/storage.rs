@@ -1,4 +1,4 @@
-use crate::schema;
+use rusty_poker_common::{Session};
 
 #[derive(Debug, PartialEq)]
 pub enum Error {
@@ -7,17 +7,17 @@ pub enum Error {
 }
 
 pub trait Storage {
-    fn save(&mut self, session: schema::Session) -> Result<(), &'static str>;
-    fn find(&self, session_id: &String) -> Result<&schema::Session, Error>;
+    fn save(&mut self, session: Session) -> Result<(), &'static str>;
+    fn find(&self, session_id: &String) -> Result<&Session, Error>;
 }
 
 pub mod memory {
-    use crate::schema;
+    use rusty_poker_common::{Session};
     use crate::storage::{Storage, Error};
     use std::collections::HashMap;
 
     pub struct MemoryStorage {
-        session_map: HashMap<String, schema::Session>,
+        session_map: HashMap<String, Session>,
     }
 
     impl MemoryStorage {
@@ -29,7 +29,7 @@ pub mod memory {
     }
 
     impl Storage for MemoryStorage {
-        fn save(&mut self, session: schema::Session) -> Result<(), &'static str> {
+        fn save(&mut self, session: Session) -> Result<(), &'static str> {
             if session.id.len() > 0 {
                 self.session_map.insert(session.id.clone(), session);
                 Result::Ok(())
@@ -38,7 +38,7 @@ pub mod memory {
             }
         }
 
-        fn find(&self, session_id: &String) -> Result<&schema::Session, Error> {
+        fn find(&self, session_id: &String) -> Result<&Session, Error> {
             let session = self.session_map.get(session_id);
             if session == None {
                 return Result::Err(Error::NotFound);
@@ -51,13 +51,13 @@ pub mod memory {
     #[cfg(test)]
     mod tests {
         use super::MemoryStorage;
-        use crate::schema;
+        use rusty_poker_common::{Session};
         use crate::storage::{Storage, Error};
 
         #[test]
         fn save_returns_ok() {
             let mut storage = MemoryStorage::new();
-            let session = schema::Session{
+            let session = Session{
                 title: "my test session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string()]
@@ -69,7 +69,7 @@ pub mod memory {
         #[test]
         fn save_returns_error_when_id_is_empty() {
             let mut storage = MemoryStorage::new();
-            let session = schema::Session{
+            let session = Session{
                 title: "empty id session".to_string(),
                 id: "".to_string(),
                 cards: vec!["1".to_string(), "2".to_string()]
@@ -81,20 +81,20 @@ pub mod memory {
         #[test]
         fn save_updates_existing_session() {
             let mut storage = MemoryStorage::new();
-            storage.save(schema::Session{
+            storage.save(Session{
                 title: "my test session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string()]
             }).expect("failed to save session");
 
-            storage.save(schema::Session{
+            storage.save(Session{
                 title: "my updated session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string(), "3".to_string()]
             }).expect("failed to update session");
 
             let session = storage.find(&"id1".to_string());
-            assert_eq!(session, Result::Ok(&schema::Session {
+            assert_eq!(session, Result::Ok(&Session {
                 title: "my updated session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string(), "3".to_string()]
@@ -111,7 +111,7 @@ pub mod memory {
         #[test]
         fn find_returns_session() {
             let mut storage = MemoryStorage::new();
-            let session = schema::Session{
+            let session = rusty_poker_common::Session{
                 title: "my test session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string()]
@@ -119,7 +119,7 @@ pub mod memory {
             storage.save(session).expect("Failed to save session");
 
             let session = storage.find(&"id1".to_string());
-            assert_eq!(session, Result::Ok(&schema::Session {
+            assert_eq!(session, Result::Ok(&rusty_poker_common::Session {
                 title: "my test session".to_string(),
                 id: "id1".to_string(),
                 cards: vec!["1".to_string(), "2".to_string()]
