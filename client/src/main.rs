@@ -41,7 +41,7 @@ impl Component for NewSessionUI {
             NewSessionMsg::CreateSession => {
                 log::info!("New title: {}", self.title);
                 let session = NewSessionParams{
-                    title: "test session".to_string()
+                    title: self.title.clone()
                 };
                 let request_body = serde_json::to_string(&session).unwrap();
                 wasm_bindgen_futures::spawn_local(async move {
