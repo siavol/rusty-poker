@@ -1,4 +1,4 @@
-use crate::schema::Session;
+use rusty_poker_common::Session;
 
 #[derive(Debug, PartialEq)]
 pub enum Error {
@@ -12,7 +12,7 @@ pub trait Storage {
 }
 
 pub mod memory {
-    use crate::schema::Session;
+    use rusty_poker_common::Session;
     use crate::storage::{Storage, Error};
     use std::collections::HashMap;
 

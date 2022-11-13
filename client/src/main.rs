@@ -1,9 +1,8 @@
-// use yew::prelude::*;
 use yew::{html, Component, Context, Html, NodeRef};
 use web_sys::HtmlInputElement;
 use gloo_net::http::Request;
 use serde_json;
-use rusty_poker_common::NewSessionParams;
+use rusty_poker_common::{NewSessionParams, Session};
 
 enum NewSessionMsg {
     CreateSession,
@@ -53,26 +52,27 @@ impl Component for NewSessionUI {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             NewSessionMsg::CreateSession => {
-                log::trace!("Creating new session with title: {}", self.title);
-                let session = NewSessionParams{
+                let params = NewSessionParams{
                     title: self.title.clone()
                 };
-                let request_body = serde_json::to_string(&session).unwrap();
+                log::debug!("Creating new session with params: {:?}", params);
+                let request_body = serde_json::to_string(&params).unwrap();
                 wasm_bindgen_futures::spawn_local(async move {
-                    Request::post("/api/session")
+                    let new_session: Session = Request::post("/api/session")
                         .header("Content-Type", "application/json")
                         .body(request_body)
                         .send()
                         .await
-                        // .unwrap()
-                        // .json()
-                        // .await
+                        .unwrap()
+                        .json()
+                        .await
                         .unwrap();
+                    log::debug!("New session created {:?}", new_session);
                 });
                 false
             },
             NewSessionMsg::UpdateTitle(value) => {
-                log::trace!("Entered title value: {}", value);
+                log::debug!("Entered title value: {}", value);
                 self.title = value;
                 false
             }
