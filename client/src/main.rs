@@ -1,14 +1,17 @@
 // use yew::prelude::*;
-use yew::{html, Component, Context, Html};
+use yew::{html, Component, Context, Html, NodeRef};
+use web_sys::HtmlInputElement;
 use gloo_net::http::Request;
 use serde_json;
-use rusty_poker_common::{NewSessionParams};
+use rusty_poker_common::NewSessionParams;
 
 enum NewSessionMsg {
-    CreateSession
+    CreateSession,
+    UpdateTitle(String)
 }
 
 struct NewSessionUI {
+    title_input: NodeRef,
     title: String,
 }
 
@@ -18,18 +21,29 @@ impl Component for NewSessionUI {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
+            title_input: NodeRef::default(),
             title: "".to_string()
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let on_create_session = ctx.link().callback(|_| NewSessionMsg::CreateSession);
+        let link = ctx.link();
+        let title_input_ref = self.title_input.clone();
+
+        let on_create_session = link.callback(|_| NewSessionMsg::CreateSession);
+        let on_change_title = link.batch_callback(move |_| {
+            let input = title_input_ref.cast::<HtmlInputElement>();
+            input.map(|input| NewSessionMsg::UpdateTitle(input.value()))
+        });
 
         html! {
             <div class="container">
                 <div class="form-group">
                     <label for="topic">{ "start new session" }</label>
-                    <input type="text" id="topic" name="topic" placeholder="your session title" />
+                    <input type="text" id="topic"
+                        ref={self.title_input.clone()}
+                        name="topic" placeholder="your session title"
+                        oninput={on_change_title} />
                 </div>
                 <button class="btn btn_bord u_margin_top" onclick={on_create_session}>{ "create" }</button>
             </div>
@@ -39,7 +53,7 @@ impl Component for NewSessionUI {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             NewSessionMsg::CreateSession => {
-                log::info!("New title: {}", self.title);
+                log::trace!("Creating new session with title: {}", self.title);
                 let session = NewSessionParams{
                     title: self.title.clone()
                 };
@@ -55,6 +69,11 @@ impl Component for NewSessionUI {
                         // .await
                         .unwrap();
                 });
+                false
+            },
+            NewSessionMsg::UpdateTitle(value) => {
+                log::trace!("Entered title value: {}", value);
+                self.title = value;
                 false
             }
         }

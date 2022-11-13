@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 yew="0.19"
+web-sys="0.3.60"
 log="0.4.17"
 wasm-logger="0.2.0"
 gloo-net="0.2.4"
