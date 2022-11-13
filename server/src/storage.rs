@@ -51,8 +51,8 @@ pub mod memory {
     #[cfg(test)]
     mod tests {
         use super::MemoryStorage;
-        use crate::schema::Session;
         use crate::storage::{Storage, Error};
+        use rusty_poker_common::Session;
 
         #[test]
         fn save_returns_ok() {
